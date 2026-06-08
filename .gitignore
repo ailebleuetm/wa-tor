@@ -1,0 +1,11 @@
+# 依存パッケージ
+node_modules/
+
+# コンパイル済みJS
+dist/
+
+# macOS
+.DS_Store
+
+# VSCode
+.vscode/
