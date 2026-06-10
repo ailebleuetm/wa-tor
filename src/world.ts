@@ -23,4 +23,12 @@ export class World {
       }
     }
   }
+
+  // トーラス座標変換：端を超えたら反対側へ折り返す
+  wrap(col: number, row: number): { col: number; row: number } {
+    return {
+      col: ((col % this.cols) + this.cols) % this.cols,
+      row: ((row % this.rows) + this.rows) % this.rows,
+    };
+  }
 }

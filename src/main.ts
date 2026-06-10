@@ -1,4 +1,4 @@
-import { World } from "./world";
+import { World } from "./world.js";
 
 const COLS = 50;
 const ROWS = 50;
