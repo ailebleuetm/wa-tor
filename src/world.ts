@@ -38,6 +38,36 @@ export class World {
     };
   }
 
+  // 隣接する上下左右の座標を返す
+  getNeighbors(col: number, row: number): { col: number; row: number }[] {
+    return [
+      this.wrap(col, row - 1), // 上
+      this.wrap(col, row + 1), // 下
+      this.wrap(col - 1, row), // 左
+      this.wrap(col + 1, row), // 右
+    ];
+  }
+
+  // 魚を1ステップ移動する
+  stepFishes(): void {
+    for (const fish of this.fishes) {
+      // 隣接する空きマスを探す
+      const neighbors = this.getNeighbors(fish.col, fish.row);
+      const emptyNeighbors = neighbors.filter(
+        n => !this.getFishAt(n.col, n.row)
+      );
+
+      // 空きマスがあればランダムに移動
+      if (emptyNeighbors.length > 0) {
+        const next = emptyNeighbors[Math.floor(Math.random() * emptyNeighbors.length)];
+        fish.col = next.col;
+        fish.row = next.row;
+      }
+
+      fish.age++;
+    }
+  }  
+
   // キャンバスに盤面を描画する
   draw(ctx: CanvasRenderingContext2D, cellSize: number): void {
     for (let row = 0; row < this.rows; row++) {
