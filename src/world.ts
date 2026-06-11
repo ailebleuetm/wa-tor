@@ -48,9 +48,15 @@ export class World {
     ];
   }
 
-  // 魚を1ステップ移動する
-  stepFishes(): void {
+// 魚を1ステップ移動・繁殖する
+  stepFishes(breedInterval: number): void {
+    const newFishes: Fish[] = [];
+
     for (const fish of this.fishes) {
+      // 移動前の位置を記録
+      const prevCol = fish.col;
+      const prevRow = fish.row;
+
       // 隣接する空きマスを探す
       const neighbors = this.getNeighbors(fish.col, fish.row);
       const emptyNeighbors = neighbors.filter(
@@ -65,9 +71,23 @@ export class World {
       }
 
       fish.age++;
-    }
-  }  
+      fish.breedCount++;
 
+      // 繁殖周期に達したら繁殖
+      if (fish.breedCount >= breedInterval) {
+        fish.breedCount = 0;
+
+        // 移動前の位置が空いていれば子を生成
+        if (!this.getFishAt(prevCol, prevRow)) {
+          newFishes.push(new Fish(prevCol, prevRow));
+        }
+      }
+    }
+
+    // 新しい魚を追加
+    this.fishes.push(...newFishes);
+  }
+  
   // キャンバスに盤面を描画する
   draw(ctx: CanvasRenderingContext2D, cellSize: number): void {
     for (let row = 0; row < this.rows; row++) {
