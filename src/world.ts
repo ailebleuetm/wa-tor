@@ -1,15 +1,18 @@
 import { Fish } from "./fish.js";
+import { Shark } from "./shark.js";
 
 // 盤面の管理
 export class World {
   readonly cols: number;
   readonly rows: number;
   fishes: Fish[];
+  sharks: Shark[];
 
   constructor(cols: number, rows: number) {
     this.cols = cols;
     this.rows = rows;
     this.fishes = [];
+    this.sharks = [];
   }
 
   // 魚をランダムに配置する
@@ -25,6 +28,24 @@ export class World {
     }
   }
 
+// サメをランダムに配置する
+  placeSharks(count: number): void {
+    while (this.sharks.length < count) {
+      const col = Math.floor(Math.random() * this.cols);
+      const row = Math.floor(Math.random() * this.rows);
+
+      // 同じ位置に魚やサメがいなければ配置
+      if (!this.getFishAt(col, row) && !this.getSharkAt(col, row)) {
+        this.sharks.push(new Shark(col, row));
+      }
+    }
+  }
+
+  // 指定位置のサメを返す（いなければnull）
+  getSharkAt(col: number, row: number): Shark | null {
+    return this.sharks.find(s => s.col === col && s.row === row) ?? null;
+  }
+  
   // 指定位置の魚を返す（いなければnull）
   getFishAt(col: number, row: number): Fish | null {
     return this.fishes.find(f => f.col === col && f.row === row) ?? null;
@@ -64,8 +85,8 @@ export class World {
       const neighbors = this.getNeighbors(fish.col, fish.row);
       const emptyNeighbors = neighbors.filter(n => {
         const key = `${n.col},${n.row}`;
-        return !this.getFishAt(n.col, n.row) && !occupiedAfterMove.has(key);
-      });
+        return !this.getFishAt(n.col, n.row) && !this.getSharkAt(n.col, n.row) && !occupiedAfterMove.has(key);
+     });
 
       // 空きマスがあればランダムに移動
       if (emptyNeighbors.length > 0) {
@@ -86,8 +107,8 @@ export class World {
 
         const prevKey = `${prevCol},${prevRow}`;
         // 移動前の位置が空いていれば子を生成
-        if (!this.getFishAt(prevCol, prevRow) && !occupiedAfterMove.has(prevKey)) {
-          newFishes.push(new Fish(prevCol, prevRow));
+        if (!this.getFishAt(prevCol, prevRow) && !this.getSharkAt(prevCol, prevRow) && !occupiedAfterMove.has(prevKey)) {
+              newFishes.push(new Fish(prevCol, prevRow));
           occupiedAfterMove.add(prevKey);
         }
       }
@@ -102,8 +123,12 @@ export class World {
     for (let row = 0; row < this.rows; row++) {
       for (let col = 0; col < this.cols; col++) {
         const fish = this.getFishAt(col, row);
+        const shark = this.getSharkAt(col, row);
 
-        if (fish) {
+        if (shark) {
+          // サメ：赤
+          ctx.fillStyle = "#ff0000";
+        } else if (fish) {
           // 魚：緑
           ctx.fillStyle = "#00ff00";
         } else {
