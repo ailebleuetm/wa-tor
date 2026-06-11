@@ -48,20 +48,24 @@ export class World {
     ];
   }
 
-// 魚を1ステップ移動・繁殖する
+  // 魚を1ステップ移動・繁殖する
   stepFishes(breedInterval: number): void {
     const newFishes: Fish[] = [];
+
+    // 移動後の占有位置を管理するSetを作成
+    const occupiedAfterMove = new Set<string>();
 
     for (const fish of this.fishes) {
       // 移動前の位置を記録
       const prevCol = fish.col;
       const prevRow = fish.row;
 
-      // 隣接する空きマスを探す
+      // 隣接する空きマスを探す（移動後の占有も考慮）
       const neighbors = this.getNeighbors(fish.col, fish.row);
-      const emptyNeighbors = neighbors.filter(
-        n => !this.getFishAt(n.col, n.row)
-      );
+      const emptyNeighbors = neighbors.filter(n => {
+        const key = `${n.col},${n.row}`;
+        return !this.getFishAt(n.col, n.row) && !occupiedAfterMove.has(key);
+      });
 
       // 空きマスがあればランダムに移動
       if (emptyNeighbors.length > 0) {
@@ -70,6 +74,9 @@ export class World {
         fish.row = next.row;
       }
 
+      // 移動後の位置を占有済みとして記録
+      occupiedAfterMove.add(`${fish.col},${fish.row}`);
+
       fish.age++;
       fish.breedCount++;
 
@@ -77,9 +84,11 @@ export class World {
       if (fish.breedCount >= breedInterval) {
         fish.breedCount = 0;
 
+        const prevKey = `${prevCol},${prevRow}`;
         // 移動前の位置が空いていれば子を生成
-        if (!this.getFishAt(prevCol, prevRow)) {
+        if (!this.getFishAt(prevCol, prevRow) && !occupiedAfterMove.has(prevKey)) {
           newFishes.push(new Fish(prevCol, prevRow));
+          occupiedAfterMove.add(prevKey);
         }
       }
     }
@@ -87,7 +96,7 @@ export class World {
     // 新しい魚を追加
     this.fishes.push(...newFishes);
   }
-  
+
   // キャンバスに盤面を描画する
   draw(ctx: CanvasRenderingContext2D, cellSize: number): void {
     for (let row = 0; row < this.rows; row++) {
