@@ -46,11 +46,15 @@ export class World {
     return this.sharks.find(s => s.col === col && s.row === row) ?? null;
   }
 
-// サメを1ステップ移動・捕食する
-  stepSharks(starvationLimit: number): void {
+// サメを1ステップ移動・捕食・繁殖する
+  stepSharks(starvationLimit: number, breedInterval: number): void {
+    const newSharks: Shark[] = [];
     const occupiedAfterMove = new Set<string>();
 
     for (const shark of this.sharks) {
+      const prevCol = shark.col;
+      const prevRow = shark.row;
+
       // 隣接マスを取得
       const neighbors = this.getNeighbors(shark.col, shark.row);
 
@@ -87,11 +91,28 @@ export class World {
 
       occupiedAfterMove.add(`${shark.col},${shark.row}`);
       shark.age++;
-    
-        // 餓死したサメを除去
+      shark.breedCount++;
+
+      // 繁殖周期に達したら繁殖
+      if (shark.breedCount >= breedInterval) {
+        shark.breedCount = 0;
+
+        const prevKey = `${prevCol},${prevRow}`;
+        if (!this.getFishAt(prevCol, prevRow) &&
+            !this.getSharkAt(prevCol, prevRow) &&
+            !occupiedAfterMove.has(prevKey)) {
+          newSharks.push(new Shark(prevCol, prevRow));
+          occupiedAfterMove.add(prevKey);
+        }
+      }
+    }
+
+    // 新しいサメを追加
+    this.sharks.push(...newSharks);
+
+    // 餓死したサメを除去
     this.sharks = this.sharks.filter(s => s.hungerCount < starvationLimit);
 }
-  }
 
   // 指定位置の魚を返す（いなければnull）
   getFishAt(col: number, row: number): Fish | null {
