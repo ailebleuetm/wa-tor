@@ -16,6 +16,7 @@ canvas.height = ROWS * CELL_SIZE;
 
 const statStep = document.getElementById("stat-step")!;
 const statFish = document.getElementById("stat-fish")!;
+const statShark = document.getElementById("stat-shark")!;
 
 let stepCount = 0;
 
@@ -31,6 +32,7 @@ function step(): void {
   stepCount++;
   statStep.textContent = String(stepCount);
   statFish.textContent = String(world.fishes.length);
+  statShark.textContent = String(world.sharks.length);
 }
 
 setInterval(step, 1000 / FPS);
