@@ -47,7 +47,7 @@ export class World {
   }
 
 // サメを1ステップ移動・捕食する
-  stepSharks(): void {
+  stepSharks(starvationLimit: number): void {
     const occupiedAfterMove = new Set<string>();
 
     for (const shark of this.sharks) {
@@ -87,9 +87,12 @@ export class World {
 
       occupiedAfterMove.add(`${shark.col},${shark.row}`);
       shark.age++;
-    }
+    
+        // 餓死したサメを除去
+    this.sharks = this.sharks.filter(s => s.hungerCount < starvationLimit);
+}
   }
-      
+
   // 指定位置の魚を返す（いなければnull）
   getFishAt(col: number, row: number): Fish | null {
     return this.fishes.find(f => f.col === col && f.row === row) ?? null;

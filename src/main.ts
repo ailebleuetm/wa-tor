@@ -5,6 +5,7 @@ const ROWS = 50;
 const CELL_SIZE = 12;
 const FISH_COUNT = 100;
 const SHARK_COUNT = 20;
+const SHARK_STARVATION_LIMIT = 5;
 const FPS = 10;
 const FISH_BREED_INTERVAL = 5;
 
@@ -26,7 +27,7 @@ world.placeSharks(SHARK_COUNT);
 
 function step(): void {
   world.stepFishes(FISH_BREED_INTERVAL);
-  world.stepSharks();
+  world.stepSharks(SHARK_STARVATION_LIMIT);
   world.draw(ctx, CELL_SIZE);
 
   stepCount++;
