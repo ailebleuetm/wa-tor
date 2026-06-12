@@ -25,6 +25,7 @@ world.placeSharks(SHARK_COUNT);
 
 function step(): void {
   world.stepFishes(FISH_BREED_INTERVAL);
+  world.stepSharks();
   world.draw(ctx, CELL_SIZE);
 
   stepCount++;

@@ -45,7 +45,40 @@ export class World {
   getSharkAt(col: number, row: number): Shark | null {
     return this.sharks.find(s => s.col === col && s.row === row) ?? null;
   }
-  
+
+// サメを1ステップ移動する
+  stepSharks(): void {
+    // 移動後の占有位置を管理するSetを作成
+    const occupiedAfterMove = new Set<string>();
+
+    // 既存の魚の位置を占有済みとして登録
+    for (const fish of this.fishes) {
+      occupiedAfterMove.add(`${fish.col},${fish.row}`);
+    }
+
+    for (const shark of this.sharks) {
+      // 隣接する空きマスを探す
+      const neighbors = this.getNeighbors(shark.col, shark.row);
+      const emptyNeighbors = neighbors.filter(n => {
+        const key = `${n.col},${n.row}`;
+        return !this.getFishAt(n.col, n.row) &&
+               !this.getSharkAt(n.col, n.row) &&
+               !occupiedAfterMove.has(key);
+      });
+
+      // 空きマスがあればランダムに移動
+      if (emptyNeighbors.length > 0) {
+        const next = emptyNeighbors[Math.floor(Math.random() * emptyNeighbors.length)];
+        occupiedAfterMove.delete(`${shark.col},${shark.row}`);
+        shark.col = next.col;
+        shark.row = next.row;
+      }
+
+      occupiedAfterMove.add(`${shark.col},${shark.row}`);
+      shark.age++;
+    }
+  }
+    
   // 指定位置の魚を返す（いなければnull）
   getFishAt(col: number, row: number): Fish | null {
     return this.fishes.find(f => f.col === col && f.row === row) ?? null;
