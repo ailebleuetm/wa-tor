@@ -29,7 +29,23 @@
         display: flex;
         gap: 24px;
       }
-    </style>
+      #controls {
+        display: flex;
+        gap: 12px;
+      }
+      button {
+        background-color: #333;
+        color: #00ff00;
+        border: 1px solid #00ff00;
+        padding: 6px 18px;
+        font-family: monospace;
+        font-size: 14px;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #00ff00;
+        color: #000;
+      }    </style>
   </head>
   <body>
 <body>
@@ -39,6 +55,10 @@
         <span>Step: <span id="stat-step">0</span></span>
         <span>魚: <span id="stat-fish">0</span></span>
         <span>サメ: <span id="stat-shark">0</span></span>
+      </div>
+      <div id="controls">
+        <button id="btn-start">Start</button>
+        <button id="btn-pause">Pause</button>
       </div>
     </div>
     <script type="module" src="./dist/main.js"></script>

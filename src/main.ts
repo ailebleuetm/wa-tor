@@ -5,10 +5,10 @@ const ROWS = 50;
 const CELL_SIZE = 12;
 const FISH_COUNT = 100;
 const SHARK_COUNT = 20;
-const SHARK_STARVATION_LIMIT = 5;
-const SHARK_BREED_INTERVAL = 10;
 const FPS = 10;
 const FISH_BREED_INTERVAL = 5;
+const SHARK_STARVATION_LIMIT = 5;
+const SHARK_BREED_INTERVAL = 10;
 
 const canvas = document.getElementById("world") as HTMLCanvasElement;
 const ctx = canvas.getContext("2d")!;
@@ -20,7 +20,11 @@ const statStep = document.getElementById("stat-step")!;
 const statFish = document.getElementById("stat-fish")!;
 const statShark = document.getElementById("stat-shark")!;
 
+const btnStart = document.getElementById("btn-start")!;
+const btnPause = document.getElementById("btn-pause")!;
+
 let stepCount = 0;
+let intervalId: number | null = null;
 
 const world = new World(COLS, ROWS);
 world.placeFishes(FISH_COUNT);
@@ -37,4 +41,19 @@ function step(): void {
   statShark.textContent = String(world.sharks.length);
 }
 
-setInterval(step, 1000 / FPS);
+function start(): void {
+  if (intervalId !== null) return;
+  intervalId = setInterval(step, 1000 / FPS);
+}
+
+function pause(): void {
+  if (intervalId === null) return;
+  clearInterval(intervalId);
+  intervalId = null;
+}
+
+btnStart.addEventListener("click", start);
+btnPause.addEventListener("click", pause);
+
+// 初期描画
+world.draw(ctx, CELL_SIZE);
