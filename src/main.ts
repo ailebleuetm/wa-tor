@@ -22,6 +22,7 @@ const statShark = document.getElementById("stat-shark")!;
 
 const btnStart = document.getElementById("btn-start")!;
 const btnPause = document.getElementById("btn-pause")!;
+const btnStep = document.getElementById("btn-step")!;
 
 let stepCount = 0;
 let intervalId: number | null = null;
@@ -54,6 +55,10 @@ function pause(): void {
 
 btnStart.addEventListener("click", start);
 btnPause.addEventListener("click", pause);
+btnStep.addEventListener("click", () => {
+  pause();
+  step();
+});
 
 // 初期描画
 world.draw(ctx, CELL_SIZE);
